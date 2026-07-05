@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
-    Route::apiResource('/product',ProductController::class);
-    Route::apiResource('/category',CategoryController::class);
-    Route::apiResource('/user',UserController::class);
-    Route::apiResource('/order',OrderController::class);
+    Route::apiResource('/products',ProductController::class);
+    Route::apiResource('/categories',CategoryController::class);
+    Route::apiResource('/users',UserController::class);
+    Route::apiResource('/orders',OrderController::class);
 });
