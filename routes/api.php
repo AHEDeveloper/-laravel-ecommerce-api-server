@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProductGalleryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
@@ -14,4 +15,13 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('/categories',CategoryController::class);
     Route::apiResource('/users',UserController::class);
     Route::apiResource('/orders',OrderController::class);
+
+    Route::prefix('product/{product}/gallery')->controller(ProductGalleryController::class)
+        ->group(function (){
+           Route::get('/','index');
+           Route::post('/','store');
+           Route::delete('/{image}','delete');
+        });
 });
+
+

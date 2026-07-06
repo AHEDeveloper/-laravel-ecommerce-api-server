@@ -97,8 +97,7 @@ class ProductController extends Controller
             return ApiResponseClass::apiResponse(false, 'product Failed', null, 422);
         }
         $product->delete();
-        return response()->json([
-           'status' => 'true'
-        ]);
+        return ApiResponseClass::apiResponse(true, 'product deleted', null, 200);
+
     }
 }
