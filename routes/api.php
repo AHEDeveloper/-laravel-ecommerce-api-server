@@ -8,20 +8,25 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductGalleryController;
 use Illuminate\Support\Facades\Route;
-
 Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-    Route::apiResource('/products',ProductController::class);
-    Route::apiResource('/categories',CategoryController::class);
-    Route::apiResource('/users',UserController::class);
-    Route::apiResource('/orders',OrderController::class);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::middleware('auth:sanctum')->group(function (){
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::prefix('product/{product}/gallery')->controller(ProductGalleryController::class)
-        ->group(function (){
-           Route::get('/','index');
-           Route::post('/','store');
-           Route::delete('/{image}','delete');
-        });
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+        Route::apiResource('/products', ProductController::class);
+        Route::apiResource('/categories', CategoryController::class);
+        Route::apiResource('/users', UserController::class);
+        Route::apiResource('/orders', OrderController::class);
+
+        Route::prefix('product/{product}/gallery')->controller(ProductGalleryController::class)
+            ->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::delete('/{image}', 'delete');
+            });
+    });
 });
 
 
