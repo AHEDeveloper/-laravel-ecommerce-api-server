@@ -25,7 +25,7 @@ class AuthController extends Controller
            return ApiResponseClass::errorResponse('UnAuthorized','invalid Credentials',null,403);
        }
        $user = Auth::user();
-       if (!$user->is_admin)
+       if ($user->is_admin = 0)
        {
            return ApiResponseClass::apiResponse('Forbbiden','Access denied',null,403);
        }

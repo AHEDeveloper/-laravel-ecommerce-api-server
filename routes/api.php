@@ -7,11 +7,13 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductGalleryController;
+use App\Http\Controllers\Api\V1\AuthApiController;
 use Illuminate\Support\Facades\Route;
+
 Route::prefix('admin')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::middleware('auth:sanctum')->group(function (){
+    Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -26,6 +28,14 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', 'store');
                 Route::delete('/{image}', 'delete');
             });
+    });
+});
+
+Route::prefix('v1')->group(function () {
+    Route::post('/register', [AuthApiController::class, 'register']);
+    Route::post('/login', [AuthApiController::class, 'login']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthApiController::class, 'logout']);
     });
 });
 
