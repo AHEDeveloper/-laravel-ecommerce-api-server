@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductGalleryController;
 use App\Http\Controllers\Api\V1\AuthApiController;
 use App\Http\Controllers\Api\V1\CategoryApiController;
+use App\Http\Controllers\Api\V1\ProductApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
@@ -32,6 +33,8 @@ Route::prefix('admin')->group(function () {
     });
 });
 
+//////////////////User Api //////////////////////
+
 Route::prefix('v1')->group(function () {
 
     Route::post('/register', [AuthApiController::class, 'register']);
@@ -40,8 +43,12 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/logout', [AuthApiController::class, 'logout']);
+
         Route::get('/category',[CategoryApiController::class,'parent']);
         Route::get('/category/{id}/children',[CategoryApiController::class,'children']);
+
+        Route::get('/products',[ProductApiController::class,'index']);
+        Route::get('/products/{id}',[ProductApiController::class,'show']);
 
     });
 });
