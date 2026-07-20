@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductGalleryController;
 use App\Http\Controllers\Api\V1\AuthApiController;
+use App\Http\Controllers\Api\V1\CartApiController;
 use App\Http\Controllers\Api\V1\CategoryApiController;
 use App\Http\Controllers\Api\V1\ProductApiController;
 use Illuminate\Support\Facades\Route;
@@ -43,14 +44,15 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/logout', [AuthApiController::class, 'logout']);
-
-        Route::get('/category',[CategoryApiController::class,'parent']);
-        Route::get('/category/{id}/children',[CategoryApiController::class,'children']);
-
-        Route::get('/products',[ProductApiController::class,'index']);
-        Route::get('/products/{id}',[ProductApiController::class,'show']);
+        Route::get('/carts',[CartApiController::class,'index']);
 
     });
+    Route::get('/category',[CategoryApiController::class,'parent']);
+    Route::get('/category/{id}/children',[CategoryApiController::class,'children']);
+
+    Route::get('/products',[ProductApiController::class,'index']);
+    Route::get('/products/{id}',[ProductApiController::class,'show']);
+
 });
 
 

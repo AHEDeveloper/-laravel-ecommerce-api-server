@@ -45,7 +45,6 @@ class ProductApiController extends Controller
         }
 
         $per_page = (int) $request->get('per_page',10);
-        $per_page = 10;
         if ($per_page < 1) $per_page = 10;
         if ($per_page > 100) $per_page = 100;
 
