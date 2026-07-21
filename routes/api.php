@@ -46,6 +46,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthApiController::class, 'logout']);
         Route::get('/carts',[CartApiController::class,'index']);
         Route::post('/carts',[CartApiController::class,'store']);
+        Route::put('/carts/{cartId}',[CartApiController::class,'update']);
+        Route::delete('/carts/{cartId}',[CartApiController::class,'destroy']);
+        Route::delete('/carts',[CartApiController::class,'clear']);
 
     });
     Route::get('/category',[CategoryApiController::class,'parent']);

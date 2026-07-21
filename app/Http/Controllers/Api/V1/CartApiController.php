@@ -17,16 +17,17 @@ class CartApiController extends Controller
     {
         $userId = Auth::id();
         $items = CartItem::query()
-            ->with('product:id,name,slug,thumbnail')
+            ->with('product:id,name,slug,price,thumbnail')
             ->get(['id', 'product_id', 'quantity']);
 
         $totalQty = 0;
         $totalPrice = 0;
-        $payloadItems = $items->map(function ($item) use ($totalQty, $totalPrice) {
+//        dd($items);
+        $payloadItems = $items->map(function ($item) use (&$totalQty, &$totalPrice) {
             $product = $item->product;
             $lineTotal = $item->quantity * $product->price;
             $totalQty += $item->quantity;
-            $totalPrice += $product->price;
+            $totalPrice += $lineTotal;
             return [
                 'id' => $item->id,
                 'product' => $product ? [
@@ -35,7 +36,7 @@ class CartApiController extends Controller
                     'slug' => $product->slug,
                 ] : null,
                 'quantity' => $totalQty,
-                'total_line' => $totalPrice
+                'total_line' => $lineTotal
             ];
         });
         return ApiResponseClass::apiResponse(true, 'ok', [
@@ -106,5 +107,27 @@ class CartApiController extends Controller
             return ApiResponseClass::apiResponse(false,'cloud not to add cart',$e->getMessage(),500);
 
         }
+    }
+
+    public function destroy($cartId)
+    {
+        $cart = CartItem::query()
+            ->where('id',$cartId)
+            ->where('user_id',Auth::id())
+            ->first();
+        if (!$cart)
+        {
+            return ApiResponseClass::apiResponse(false,'cart not_found',null,404);
+        }
+        $cart->delete();
+        return ApiResponseClass::apiResponse(true,'cart item deleted',null,200);
+    }
+    public function clear()
+    {
+        $cart = CartItem::query()
+            ->where('user_id',Auth::id())
+           ->delete();
+
+        return ApiResponseClass::apiResponse(true,'cart item cleared',null,200);
     }
 }
