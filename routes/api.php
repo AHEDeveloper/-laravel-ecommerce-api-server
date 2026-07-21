@@ -45,6 +45,7 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/logout', [AuthApiController::class, 'logout']);
         Route::get('/carts',[CartApiController::class,'index']);
+        Route::post('/carts',[CartApiController::class,'store']);
 
     });
     Route::get('/category',[CategoryApiController::class,'parent']);
