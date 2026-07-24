@@ -76,58 +76,91 @@ class CartApiController extends Controller
                 ->first();
 
             if ($item) {
-                    $newQty = $item->quantity + $qty;
-                    if ($newQty > $product->stock)
-                    {
-                        DB::rollBack();
-                        return ApiResponseClass::apiResponse(false,'product Out of sock',null,422);
-                    }
-                    $item->quantity = $newQty;
-                    $item->save();
-            }else{
-                if ($qty > $product->stock){
+                $newQty = $item->quantity + $qty;
+                if ($newQty > $product->stock) {
                     DB::rollBack();
-                    return ApiResponseClass::apiResponse(false,'product Out of sock',null,422);
+                    return ApiResponseClass::apiResponse(false, 'product Out of sock', null, 422);
+                }
+                $item->quantity = $newQty;
+                $item->save();
+            } else {
+                if ($qty > $product->stock) {
+                    DB::rollBack();
+                    return ApiResponseClass::apiResponse(false, 'product Out of sock', null, 422);
                 }
                 $item = CartItem::query()->create([
-                   'product_id' => $productId,
-                   'quantity' => $qty,
-                   'user_id' => $userId
+                    'product_id' => $productId,
+                    'quantity' => $qty,
+                    'user_id' => $userId
                 ]);
             }
-             DB::commit();
-            return ApiResponseClass::apiResponse(true,'Add to cart',[
+            DB::commit();
+            return ApiResponseClass::apiResponse(true, 'Add to cart', [
                 'id' => $item->id,
                 'product_id' => $product->id,
                 'quantity' => $item->quantity
-            ],201);
+            ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return ApiResponseClass::apiResponse(false,'cloud not to add cart',$e->getMessage(),500);
+            return ApiResponseClass::apiResponse(false, 'cloud not to add cart', $e->getMessage(), 500);
 
         }
+    }
+
+    public function update(Request $request, $cartId)
+    {
+        $validation = Validator::make($request->all(), [
+            'quantity' => 'required|integer|min:1|max:100',
+        ]);
+        if ($validation->fails()) {
+            return ApiResponseClass::apiResponse(false, 'Validation failed. Please check the submitted data.', $validation->errors(), 422);
+        }
+        $userId = Auth::id();
+        $cart = CartItem::query()->where('id', $cartId)
+            ->where('user_id',$userId)
+            ->first();
+
+        if (!$cart) {
+            return ApiResponseClass::apiResponse(false, 'Cart item not found.', null, 422);
+        }
+        $product = Product::query()->select(['id', 'stock'])->find($cart->product_id);
+
+        if (!$product) {
+            return ApiResponseClass::apiResponse(false, 'Product not found.', null, 422);
+        }
+        $newQty  = (int) $request->quantity;
+        if ($newQty > $product->stock) {
+            return ApiResponseClass::apiResponse(false, 'Requested quantity exceeds available stock.', null, 422);
+        }
+        $cart->quantity = $newQty;
+        $cart->save();
+        return ApiResponseClass::apiResponse(true, 'Cart item updated successfully', [
+            'id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => $cart->quantity
+        ], 200);
     }
 
     public function destroy($cartId)
     {
         $cart = CartItem::query()
-            ->where('id',$cartId)
-            ->where('user_id',Auth::id())
+            ->where('id', $cartId)
+            ->where('user_id', Auth::id())
             ->first();
-        if (!$cart)
-        {
-            return ApiResponseClass::apiResponse(false,'cart not_found',null,404);
+        if (!$cart) {
+            return ApiResponseClass::apiResponse(false, 'cart not_found', null, 404);
         }
         $cart->delete();
-        return ApiResponseClass::apiResponse(true,'cart item deleted',null,200);
+        return ApiResponseClass::apiResponse(true, 'cart item deleted', null, 200);
     }
+
     public function clear()
     {
         $cart = CartItem::query()
-            ->where('user_id',Auth::id())
-           ->delete();
+            ->where('user_id', Auth::id())
+            ->delete();
 
-        return ApiResponseClass::apiResponse(true,'cart item cleared',null,200);
+        return ApiResponseClass::apiResponse(true, 'cart item cleared', null, 200);
     }
 }
